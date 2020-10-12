@@ -1,6 +1,7 @@
 # hebcal-rs: hebcal.com client for Shabbat times
 
 [![crates.io](https://img.shields.io/crates/d/hebcal.svg)](https://crates.io/crates/hebcal)
+[![docs](https://docs.rs/mio/badge.svg)](https://docs.rs/mio/badge.svg)
 [![Rust](https://github.com/joshrotenberg/hebcal-rs/workflows/Rust/badge.svg)](https://github.com/joshrotenberg/hebcal-rs/actions?query=workflow%3ARust)
 
 `hebcal-rs` is a client library in Rust for requesting Shabbat times from the API at `http://www.hebcal.com`. 
