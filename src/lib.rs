@@ -1,19 +1,46 @@
-///! # HebCal: hebcal.com REST API client
-///! HebCal is an API client for several of the RESTful APIs offered at https://www.hebcal.com/home/developer-apis
-///! 
-/// 
-/// 
-use self::shabbat::ShabbatHandler;
-use anyhow::Result;
+//! ## HebCal: hebcal.com REST API client
+//! HebCal is an API client for several of the RESTful APIs offered at https://www.hebcal.com/home/developer-apis
+//!
+//! ### Shabbat API
+//!
+//! The Shabbat times API returns location specific Shabbat times and details.
+//!
+//! ```no_run
+//! use hebcal::{
+//!     shabbat::{Leyning, Transliteration},
+//!     HebCal, Result,
+//! };
+//!
+//! async fn main() -> Result<()> {
+//!     let hebcal = HebCal::default();
+//!     let shabbat = hebcal
+//!      .shabbat()
+//!      .transliteration(Transliteration::Ashkenazic)
+//!      .zip("94706")
+//!      .leyning(Leyning::Off)
+//!      .send()
+//!      .await?;
+//!     
+//!     // do stuff with `shabbat`
+//!
+//!     Ok(())
+//! }
+//!
+//! ```
+//!
+use self::{error::HebCalError, shabbat::ShabbatHandler};
 use reqwest::{Client, Response, Url};
-use serde::{Deserialize, Serialize};
-use std::io::Error;
+use serde::Serialize;
 
-const HEBCAL_BASE_URL: &str = "https://www.hebcal.com";
-
+mod error;
 pub mod shabbat;
 
-/// The main client struct
+const HEBCAL_BASE_URL: &str = "https://www.hebcal.com";
+const HEBCAL_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
+
+pub type Result<T, E = error::Error> = std::result::Result<T, E>;
+
+/// The client
 #[derive(Debug, Clone)]
 pub struct HebCal {
     client: Client,
@@ -24,17 +51,21 @@ impl Default for HebCal {
     fn default() -> Self {
         Self {
             base_url: Url::parse(HEBCAL_BASE_URL).unwrap(),
-            client: reqwest::ClientBuilder::new().build().unwrap(),
+            client: reqwest::ClientBuilder::new()
+                .user_agent(HEBCAL_USER_AGENT)
+                .build()
+                .unwrap(),
         }
     }
 }
 
 impl HebCal {
+    /// Returns a handler for the Shabbat times API
     pub fn shabbat(&self) -> ShabbatHandler {
         ShabbatHandler::new(self)
     }
 
-    pub async fn get<P>(&self, path: impl AsRef<str>, params: Option<&P>) -> Result<Response>
+    pub(crate) async fn get<P>(&self, path: impl AsRef<str>, params: Option<&P>) -> Result<Response>
     where
         P: Serialize + ?Sized,
     {
@@ -43,16 +74,14 @@ impl HebCal {
         if let Some(p) = params {
             req = req.query(p);
         }
-        dbg!(&req);
+        
         let res = req.send().await?;
-        Ok(res)
+        if res.status().is_success() {
+            Ok(res)
+        } else {
+            let e: HebCalError = res.json::<HebCalError>().await?;
+            Err(error::Error::HebCal { error: e })
+        }
     }
 }
 
-#[cfg(test)]
-mod tests {
-    #[tokio::test]
-    async fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
