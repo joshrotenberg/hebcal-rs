@@ -5,6 +5,8 @@ homepage = "https://github.com/joshrotenberg/hebcal-rs"
 name = "hebcal"
 readme = "README.md"
 repository = "https://github.com/joshrotenberg/hebcal-rs.git"
+description = "A hebcal.com REST API Client"
+license = "MIT or Apache 2.0"
 version = "0.1.0"
 
 [dependencies]
