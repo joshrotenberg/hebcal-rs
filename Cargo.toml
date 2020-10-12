@@ -1,17 +1,20 @@
 [package]
 authors = ["josh rotenberg <joshrotenberg@gmail.com>"]
 edition = "2018"
+homepage = "https://github.com/joshrotenberg/hebcal-rs"
 name = "hebcal"
+readme = "README.md"
+repository = "https://github.com/joshrotenberg/hebcal-rs.git"
 version = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-anyhow = "1.0.32"
-chrono = {version = "0.4.16", features = ["serde"]}
-# chrono-tz = "0.5"
+chrono = {version = "0.4.19", features = ["serde"]}
 reqwest = {version = "0.10", features = ["json"]}
 serde = {version = "1.0.116", features = ["derive"]}
-serde_json = "1.0.57"
-tokio = {version = "0.2", features = ["full"]}
+serde_json = "1.0.59"
+thiserror = "1.0"
 url = {version = "2.1.1", features = ["serde"]}
+
+[dev-dependencies]
+anyhow = "1.0.33"
+tokio = {version = "0.2.22", features = ["full"]}
