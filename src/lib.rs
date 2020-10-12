@@ -11,7 +11,7 @@
 //!     HebCal, Result,
 //! };
 //!
-//! async fn main() -> Result<()> {
+//! async fn f() -> Result<(), Box<dyn std::error::Error>> {
 //!     let hebcal = HebCal::default();
 //!     let shabbat = hebcal
 //!      .shabbat()
